@@ -10,9 +10,9 @@ particle.density = 1050; % kg/m^3;
 particle.volume = 4/3*pi*(particle.diameter/2)^3; % m^3
 particle.mass = particle.density*particle.volume; % kg
 particle.T = 300;
+particle.initialPosition = [0;0;0];
+particle.initialVelocity = [0;0;-1];
 
-initialPosition = [0;0;0];
-initialVelocity = [0;0;-1];
 tspan = [0 1]; %timespan
 dt = 0.001;
 
@@ -23,15 +23,11 @@ Nt = 1000; % monte carlo simulation count
 data = zeros(2,Nt);
 for k = 1:Nt 
     q = zeros(6,Ni);
-    q(1:3,1) = initialPosition;
-    q(4:6,1) = initialVelocity;
-    kb = 1.380649 * 10^-23; % m2 kg s-2 K-1 boltzmanns constant
+    q(1:3,1) = particle.initialPosition;
+    q(4:6,1) = particle.initialVelocity;
 
     for i = 1:Ni 
-        u = q(4:6,i); % particle. velocity
-        h = gas.mass/(2*kb*gas.T);
-        hprime = particle.mass/(2*kb*particle.T);
-        %[F_drag,F_brwn] = microscopicForce(h,hprime,gas.p,particle.diameter/2,gas.mass,u);
+        u = q(4:6,i); % particle.velocity
         [F_drag,F_brwn] = stokesForce(u,gas,particle);
         a_g = [0,0,-9.8]';
         dqdt = [u;...
@@ -71,6 +67,6 @@ F_drag = (3*pi*gas.mu*particle.diameter.*(Uvec-gas.u))./Cc; % Drag Force
 S0 = 216*gas.mu*kb*gas.T./... % brownian diffusion coeff
     (pi^2*particle.diameter.^5*particle.density^2.*Cc);
 
-F_brwn = particle.mass.*sqrt(pi*S0); % Stochastic Brownian Force 
+F_brwn = particle.mass.*sqrt(pi*S0);% Stochastic Brownian Force
 
 end
